@@ -10,8 +10,11 @@ class TrueRandBot extends PircBot {
                          sender: String,
                          login: String,
                          hostname: String,
-                         message: String) = message match {
-    case (new Regex(""".r d([0-9]+)""")(num) => println(num)
-    case _ => println("d")
+                         message: String) = {
+    val reg = new Regex("""^.r (?:([1-9]+)#)?([1-9]*)d([1-9]*)((?:\+[1-9]+)*) ([\p{P}\w\u2e80-\u9fff]*)""")
+    message match {
+      case reg(num, dice, face, bonus, desc) => println(num)
+      case _ => println("d")
+    }
   }
 }
