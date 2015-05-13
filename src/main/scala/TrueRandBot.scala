@@ -13,16 +13,27 @@ class TrueRandBot extends PircBot {
     val reg = """^.r (?:([1-9]+\d*)#)?([1-9]\d*)?d([1-9]\d*)?((?:\+[1-9]\d*)*) ?([\p{P}\w\u2e80-\u9fff]*)""".r
     println(message)
     message match {
-      case reg(num, dice, face, bonus, desc) => getResult(num, dice, face, bonus, desc)
+      case reg(num, dice, face, bonus, desc) => getResult(num, dice, face, bonus, desc, channel, sender)
       case _ => println(message)
     }
+  }
+
+  private def makeMultiString(sender:String, result: Array[Array[Int]]): String ={
+    val s1 = s"${Colors.BLUE}${sender}进行了${Colors.RED}${result.length}${Colors.BLUE}次检定 = （ "
+    var s = s1
+    for (i <- 0 until result.length) {
+      s += s"${result(i).last} "
+    }
+    s += "） = "
   }
 
   private def getResult(num: String,
                         dice: String,
                         face: String,
                         bonus: String,
-                        desc: String) = {
+                        desc: String,
+                        channel: String,
+                        sender: String) {
     println(s"Num:$num Dice:$dice Face:$face Bonus:$bonus Desc:$desc")
 
     val bonusSum = s"0$bonus".split("""\+""").map(_.toInt).reduceLeft(_+_)
@@ -42,6 +53,8 @@ class TrueRandBot extends PircBot {
         for (i <- 0 until num.toInt) {
           result(i) = roll.doRoll
         }
+
+        this.sendMessage(channel, makeMultiString(sender, result))
       }
       case _ => println("haha")
     }
