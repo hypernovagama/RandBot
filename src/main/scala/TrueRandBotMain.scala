@@ -1,3 +1,4 @@
+package io.inflationaaron.truerandbot
 import org.jibble.pircbot._
 
 object TrueRandBotMain {
