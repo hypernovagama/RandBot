@@ -9,8 +9,8 @@ object TrueRandBotMain {
     // Enable debugging output.
     bot.setVerbose(true)
 
-    // Connect to the IRC server.
-    bot.connect("irc.ourirc.com", 6668)
+    // Connect to the IRC server. GBK!!!
+    bot.connect("irc.ourirc.com", 6667)
 
     // Join the #pircbot channel.
     bot.joinChannel("#truerandbot")

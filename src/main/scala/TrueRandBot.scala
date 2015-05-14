@@ -9,22 +9,32 @@ class TrueRandBot extends PircBot {
                          sender: String,
                          login: String,
                          hostname: String,
-                         message: String) = {
-    val reg = """^.r (?:([1-9]+\d*)#)?([1-9]\d*)?d([1-9]\d*)?((?:\+[1-9]\d*)*) ?([\p{P}\w\u2e80-\u9fff]*)""".r
+                         message: String) {
+    val reg = """^.r (?:([1-9]+\d*)#)?([1-9]\d*)?d([1-9]\d*)?((?:\+[1-9]\d*)*) ?([\p{P}\w\u2E80-\u9FFF]*)""".r
     println(message)
-    message match {
+    val cleanMessage = Colors.removeFormattingAndColors(message)
+    cleanMessage match {
       case reg(num, dice, face, bonus, desc) => getResult(num, dice, face, bonus, desc, channel, sender)
-      case _ => println(message)
+      case _ => println("None")
     }
   }
 
-  private def makeMultiString(sender:String, result: Array[Array[Int]]): String ={
-    val s1 = s"${Colors.BLUE}${sender}½øĞĞÁË${Colors.RED}${result.length}${Colors.BLUE}´Î¼ì¶¨ = £¨ "
-    var s = s1
+  override def onInvite(targetNick: String,
+                        sourceNick: String,
+                        sourceLogin: String,
+                        sourceHostname: String,
+                        channel: String) {
+    this.joinChannel(channel)
+    this.sendMessage(channel, s"${Colors.BOLD}${Colors.RED}${targetNick}è¢«${sourceNick}ä»å¼‚ç•Œå¬å”¤è€Œæ¥ï¼")
+  }
+
+  private def makeMultiString(sender: String, desc: String, result: Array[Array[Int]]): String ={
+    var s1 = s"${Colors.BOLD}${Colors.DARK_GREEN}${sender}${Colors.BLUE}è¿›è¡Œäº†${Colors.RED}${result.length}${Colors.BLUE}æ¬¡${Colors.BROWN}${desc}${Colors.BLUE}æ£€å®š = ${Colors.RED}"
     for (i <- 0 until result.length) {
-      s += s"${result(i).last} "
+      s1 += s"${result(i).last} "
     }
-    s += "£© = "
+    s1 += " "
+    return s1
   }
 
   private def getResult(num: String,
@@ -54,7 +64,7 @@ class TrueRandBot extends PircBot {
           result(i) = roll.doRoll
         }
 
-        this.sendMessage(channel, makeMultiString(sender, result))
+        this.sendMessage(channel, makeMultiString(sender, desc, result))
       }
       case _ => println("haha")
     }

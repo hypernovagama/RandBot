@@ -42,8 +42,6 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-.idea/
-
 /RUNNING_PID
 /logs/
 /project/*-shim.sbt
