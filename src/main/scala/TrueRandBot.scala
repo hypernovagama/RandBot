@@ -1,6 +1,7 @@
 package io.inflationaaron.truerandbot
 import org.jibble.pircbot._
 import org.apache.commons.math3.random._
+import scala.collection.mutable.StringBuilder
 
 class TrueRandBot extends PircBot {
   this.setName("TrueRandBot")
@@ -29,12 +30,14 @@ class TrueRandBot extends PircBot {
   }
 
   private def makeMultiString(sender: String, desc: String, result: Array[Array[Int]]): String ={
-    var s1 = s"${Colors.BOLD}${Colors.DARK_GREEN}${sender}${Colors.BLUE}进行了${Colors.RED}${result.length}${Colors.BLUE}次${Colors.BROWN}${desc}${Colors.BLUE}检定 = ${Colors.RED}"
+    val s1 = new StringBuilder(s"${Colors.BOLD}${Colors.DARK_GREEN}$sender${Colors.BLUE}" +
+                               s"进行了${Colors.RED}${result.length}${Colors.BLUE}次${Colors.BROWN}" +
+                               s"${desc}${Colors.BLUE}检定 = ${Colors.RED}")
     for (i <- 0 until result.length) {
-      s1 += s"${result(i).last} "
+      s1 ++ s"${result(i).last} "
     }
-    s1 += " "
-    return s1
+    s1 ++ " "
+    return s1.toString
   }
 
   private def getResult(num: String,
@@ -59,7 +62,7 @@ class TrueRandBot extends PircBot {
 
     Option(num) match {
       case Some(num) if num.isInstanceOf[String] => {
-        var result = new Array[Array[Int]](num.toInt)
+        val result = new Array[Array[Int]](num.toInt)
         for (i <- 0 until num.toInt) {
           result(i) = roll.doRoll
         }
