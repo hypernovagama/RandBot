@@ -53,6 +53,10 @@ class TrueRandBot extends PircBot {
     s1.toString()
   }
 
+  private def sendError(channel: String): Unit = {
+    this.sendMessage(channel, "/me 表示需要你提供一个更强的服务器才能完成你的任务！")
+  }
+
   private def HaveRollResult(num: String,
                         dice: String,
                         face: String,
@@ -66,17 +70,22 @@ class TrueRandBot extends PircBot {
 
     val roll = new Roll(1, 20, bonusSum, mst)
 
-    roll.dice = Option(dice) match { case Some(d) => d.toInt; case None => roll.dice }
-    roll.face = Option(face) match { case Some(f) => f.toInt; case None => roll.face }
+    roll.dice = Option(dice) match { case Some(d) if d.toInt <= 100 => d.toInt
+                                     case Some(d) => sendError(channel) return
+                                     case None => roll.dice }
+    roll.face = Option(face) match { case Some(f) if f.toInt <= 100 => f.toInt
+                                     case Some(f) => sendError(channel) return
+                                     case None => roll.face }
 
     Option(num) match {
-      case Some(n) if n.isInstanceOf[String] =>
+      case Some(n) if n.toInt <= 100 =>
         val result = new Array[Array[Int]](n.toInt)
         for (i <- 0 until n.toInt) {
           result(i) = roll.doRoll()
         }
 
         this.sendMessage(channel, makeMultiString(sender, desc, result))
+      case Some(n) => sendError(channel)
       case _ => this.sendMessage(channel, makeString(sender, desc, roll.doRoll()))
     }
   }
