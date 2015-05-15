@@ -9,10 +9,17 @@ object TrueRandBotMain {
     // Enable debugging output.
     bot.setVerbose(true)
 
-    // Connect to the IRC server. GBK!!!
-    bot.connect("irc.ourirc.com", 6667)
+    // AutoNickChange
+    bot.setAutoNickChange(true)
+
+    // Encoding: UTF-8
+    bot.setEncoding("UTF-8")
+
+    // Connect to the IRC server.
+    bot.connect("irc.ourirc.com", 6668)
 
     // Join the #pircbot channel.
+    
     bot.joinChannel("#truerandbot")
   }
 }

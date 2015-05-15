@@ -1,10 +1,12 @@
 package io.inflationaaron.truerandbot
 import org.jibble.pircbot._
 import org.apache.commons.math3.random._
-import scala.collection.mutable.StringBuilder
 
 class TrueRandBot extends PircBot {
   this.setName("TrueRandBot")
+  this.setLogin("TrueRandBot")
+
+  val mst = new MersenneTwister()
 
   override def onMessage(channel: String,
                          sender: String,
@@ -15,8 +17,8 @@ class TrueRandBot extends PircBot {
     println(message)
     val cleanMessage = Colors.removeFormattingAndColors(message)
     cleanMessage match {
-      case reg(num, dice, face, bonus, desc) => getResult(num, dice, face, bonus, desc, channel, sender)
-      case _ => println("None")
+      case reg(num, dice, face, bonus, desc) => HaveResult(num, dice, face, bonus, desc, channel, sender)
+      case _ => println("None of My Business")
     }
   }
 
@@ -32,15 +34,23 @@ class TrueRandBot extends PircBot {
   private def makeMultiString(sender: String, desc: String, result: Array[Array[Int]]): String ={
     val s1 = new StringBuilder(s"${Colors.BOLD}${Colors.DARK_GREEN}$sender${Colors.BLUE}" +
                                s"进行了${Colors.RED}${result.length}${Colors.BLUE}次${Colors.BROWN}" +
-                               s"${desc}${Colors.BLUE}检定 = ${Colors.RED}")
+                               s"$desc${Colors.BLUE}检定 = ${Colors.RED}")
     for (i <- 0 until result.length) {
-      s1 ++ s"${result(i).last} "
+      s1 ++= s"${result(i).last} "
     }
-    s1 ++ " "
-    return s1.toString
+    s1 ++= " "
+    s1.toString()
   }
 
-  private def getResult(num: String,
+  private def makeString(sender: String, desc: String, result: Array[Int]): String = {
+    val s1 = new StringBuilder(s"${Colors.BOLD}${Colors.DARK_GREEN}$sender${Colors.BLUE}" +
+                               s"进行了${Colors.BROWN}$desc${Colors.BLUE}检定 = " +
+                               result.reverse.tail.mkString(s"( ${Colors.RED}", " ", s"${Colors.BLUE} ) ") +
+                               s"= ${Colors.RED}${result.last}")
+    s1.toString()
+  }
+
+  private def HaveResult(num: String,
                         dice: String,
                         face: String,
                         bonus: String,
@@ -49,9 +59,9 @@ class TrueRandBot extends PircBot {
                         sender: String) {
     println(s"Num:$num Dice:$dice Face:$face Bonus:$bonus Desc:$desc")
 
-    val bonusSum = s"0$bonus".split("""\+""").map(_.toInt).reduceLeft(_+_)
+    val bonusSum = s"0$bonus".split("""\+""").map(_.toInt).sum
 
-    val roll = new Roll(1, 20, bonusSum, new MersenneTwister)
+    val roll = new Roll(1, 20, bonusSum, mst)
 
     (Option(dice), Option(face)) match {
       case (Some(dice), Some(face)) => roll.dice = dice.toInt;roll.face = face.toInt
@@ -64,12 +74,12 @@ class TrueRandBot extends PircBot {
       case Some(num) if num.isInstanceOf[String] => {
         val result = new Array[Array[Int]](num.toInt)
         for (i <- 0 until num.toInt) {
-          result(i) = roll.doRoll
+          result(i) = roll.doRoll()
         }
 
         this.sendMessage(channel, makeMultiString(sender, desc, result))
       }
-      case _ => println("haha")
+      case _ => this.sendMessage(channel, makeString(sender, desc, roll.doRoll()))
     }
   }
 }
