@@ -12,13 +12,16 @@ class TrueRandBot extends PircBot {
                          sender: String,
                          login: String,
                          hostname: String,
-                         message: String) {
-    val reg = """^.r (?:([1-9]+\d*)#)?([1-9]\d*)?d([1-9]\d*)?((?:\+[1-9]\d*)*) ?([\p{P}\w\u2E80-\u9FFF]*)""".r
-    println(message)
+                         message: String): Unit = {
+    val RollExpression = """^.r (?:([1-9]+\d*)#)?([1-9]\d*)?d([1-9]\d*)?((?:\+[1-9]\d*)*) ?([\p{P}\w\u2E80-\u9FFF]*)""".r
+    val LuckExpression = """^.rp""".r
+
+    log(message)
     val cleanMessage = Colors.removeFormattingAndColors(message)
     cleanMessage match {
-      case reg(num, dice, face, bonus, desc) => HaveResult(num, dice, face, bonus, desc, channel, sender)
-      case _ => println("None of My Business")
+      case RollExpression(num, dice, face, bonus, desc) => HaveRollResult(num, dice, face, bonus, desc, channel, sender)
+      case LuckExpression() => HaveRpResult(channel, sender)
+      case _ => log("None of My Business")
     }
   }
 
@@ -26,7 +29,7 @@ class TrueRandBot extends PircBot {
                         sourceNick: String,
                         sourceLogin: String,
                         sourceHostname: String,
-                        channel: String) {
+                        channel: String): Unit = {
     this.joinChannel(channel)
     this.sendMessage(channel, s"${Colors.BOLD}${Colors.RED}${targetNick}被${sourceNick}从异界召唤而来！")
   }
@@ -50,36 +53,36 @@ class TrueRandBot extends PircBot {
     s1.toString()
   }
 
-  private def HaveResult(num: String,
+  private def HaveRollResult(num: String,
                         dice: String,
                         face: String,
                         bonus: String,
                         desc: String,
                         channel: String,
-                        sender: String) {
-    println(s"Num:$num Dice:$dice Face:$face Bonus:$bonus Desc:$desc")
+                        sender: String): Unit = {
+    log(s"Num:$num Dice:$dice Face:$face Bonus:$bonus Desc:$desc")
 
     val bonusSum = s"0$bonus".split("""\+""").map(_.toInt).sum
 
     val roll = new Roll(1, 20, bonusSum, mst)
 
-    (Option(dice), Option(face)) match {
-      case (Some(dice), Some(face)) => roll.dice = dice.toInt;roll.face = face.toInt
-      case (Some(dice), None) => roll.dice = dice.toInt
-      case (None, Some(face)) => roll.face = face.toInt
-      case _ =>
-    }
+    roll.dice = Option(dice) match { case Some(d) => d.toInt; case None => roll.dice }
+    roll.face = Option(face) match { case Some(f) => f.toInt; case None => roll.face }
 
     Option(num) match {
-      case Some(num) if num.isInstanceOf[String] => {
-        val result = new Array[Array[Int]](num.toInt)
-        for (i <- 0 until num.toInt) {
+      case Some(n) if n.isInstanceOf[String] =>
+        val result = new Array[Array[Int]](n.toInt)
+        for (i <- 0 until n.toInt) {
           result(i) = roll.doRoll()
         }
 
         this.sendMessage(channel, makeMultiString(sender, desc, result))
-      }
       case _ => this.sendMessage(channel, makeString(sender, desc, roll.doRoll()))
     }
+  }
+
+  private def HaveRpResult(channel: String, sender: String): Unit = {
+    this.sendMessage(channel, s"${Colors.BOLD}${Colors.DARK_GREEN}$sender" +
+                              s"${Colors.BLUE}今天的人品是${Colors.RED}${mst.nextInt(100) % 100 + 1}")
   }
 }
