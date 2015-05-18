@@ -1,4 +1,4 @@
-name := """TrueRandBot"""
+name := """RandBot"""
 
 version := "0.0.1"
 

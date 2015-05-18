@@ -1,10 +1,11 @@
-package io.inflationaaron.truerandbot
+package io.inflationaaron.randbot
+
 import org.jibble.pircbot._
 
-object TrueRandBotMain {
+object RandBotMain {
   def main(args: Array[String]) {
     // Now start our bot up.
-    val bot = new TrueRandBot
+    val bot = new RandBot
 
     // Enable debugging output.
     bot.setVerbose(true)
@@ -22,6 +23,6 @@ object TrueRandBotMain {
     bot.identify("!@#$TRUErandBOT%^&*")
 
     // Join the #pircbot channel.
-    bot.joinChannel("#truerandbot")
+    bot.joinChannel("#randbot")
   }
 }

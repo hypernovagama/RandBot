@@ -1,13 +1,14 @@
-package io.inflationaaron.truerandbot
+package io.inflationaaron.randbot
+
 import org.jibble.pircbot._
 import org.apache.commons.math3.random._
 
 import scala.collection.mutable
 
-class TrueRandBot extends PircBot {
-  this.setName("TrueRandBot")
-  this.setLogin("TrueRandBot")
-  this.setVersion("TrueRandBot V0.1 @ BNDS")
+class RandBot extends PircBot {
+  this.setName("RandBot")
+  this.setLogin("RandBot")
+  this.setVersion("RandBot V0.2 @ BNDS")
 
   val mst = new MersenneTwister()
   var TimeTree = new mutable.HashMap[String, Long]()
@@ -18,7 +19,7 @@ class TrueRandBot extends PircBot {
                          hostname: String,
                          message: String): Unit = {
     val RollExpression = ("""^.r (?:([1-9]+\d*)#)?([1-9]\d*)?d([1-9]\d*)?((?:\+[1-9]\d*)*) """ +
-                          """?([\p{P}\w\u2E80-\u9FFF]*)""").r
+      """?([\p{P}\w\u2E80-\u9FFF]*)""").r
     val LuckExpression = """^.rp""".r
 
     log(message)
@@ -35,7 +36,7 @@ class TrueRandBot extends PircBot {
                         sourceLogin: String,
                         sourceHostname: String,
                         channel: String): Unit = {
-    val ElementsToDrop = TimeTree.dropWhile(System.currentTimeMillis() - _._2 < 10*60*1000)
+    val ElementsToDrop = TimeTree.dropWhile(System.currentTimeMillis() - _._2 < 10 * 60 * 1000)
     ElementsToDrop.foreach { e => this.partChannel(e._1, "Timed Out") }
     this.TimeTree --= ElementsToDrop.keySet
     this.TimeTree += new Tuple2(channel, System.currentTimeMillis())
@@ -44,10 +45,10 @@ class TrueRandBot extends PircBot {
     this.sendMessage(channel, s"${Colors.BOLD}${Colors.RED}${targetNick}被${sourceNick}从异界召唤而来！")
   }
 
-  private def makeMultiString(sender: String, desc: String, result: Array[Array[Int]]): String ={
+  private def makeMultiString(sender: String, desc: String, result: Array[Array[Int]]): String = {
     val s1 = new StringBuilder(s"${Colors.BOLD}${Colors.DARK_GREEN}$sender${Colors.BLUE}" +
-                               s"进行了${Colors.RED}${result.length}${Colors.BLUE}次${Colors.BROWN}" +
-                               s"$desc${Colors.BLUE}检定 = ${Colors.RED}")
+      s"进行了${Colors.RED}${result.length}${Colors.BLUE}次${Colors.BROWN}" +
+      s"$desc${Colors.BLUE}检定 = ${Colors.RED}")
     for (i <- 0 until result.length) {
       s1 ++= s"${result(i).last} "
     }
@@ -57,9 +58,9 @@ class TrueRandBot extends PircBot {
 
   private def makeString(sender: String, desc: String, result: Array[Int]): String = {
     val s1 = new StringBuilder(s"${Colors.BOLD}${Colors.DARK_GREEN}$sender${Colors.BLUE}" +
-                               s"进行了${Colors.BROWN}$desc${Colors.BLUE}检定 = " +
-                               result.reverse.tail.mkString(s"( ${Colors.RED}", " ", s"${Colors.BLUE} ) ") +
-                               s"= ${Colors.RED}${result.last}")
+      s"进行了${Colors.BROWN}$desc${Colors.BLUE}检定 = " +
+      result.reverse.tail.mkString(s"( ${Colors.RED}", " ", s"${Colors.BLUE} ) ") +
+      s"= ${Colors.RED}${result.last}")
     s1.toString()
   }
 
@@ -68,24 +69,28 @@ class TrueRandBot extends PircBot {
   }
 
   private def HaveRollResult(num: String,
-                        dice: String,
-                        face: String,
-                        bonus: String,
-                        desc: String,
-                        channel: String,
-                        sender: String): Unit = {
+                             dice: String,
+                             face: String,
+                             bonus: String,
+                             desc: String,
+                             channel: String,
+                             sender: String): Unit = {
     log(s"Num:$num Dice:$dice Face:$face Bonus:$bonus Desc:$desc")
 
-    val bonusSum = s"0$bonus".split("""\+""").map(_.toInt).sum
+    val bonusSum = s"0$bonus".split( """\+""").map(_.toInt).sum
 
     val roll = new Roll(1, 20, bonusSum, mst)
 
-    roll.dice = Option(dice) match { case Some(d) if d.toInt <= 100 => d.toInt
-                                     case Some(d) => sendError(channel);return
-                                     case None => roll.dice }
-    roll.face = Option(face) match { case Some(f) if f.toInt <= 100 => f.toInt
-                                     case Some(f) => sendError(channel);return
-                                     case None => roll.face }
+    roll.dice = Option(dice) match {
+      case Some(d) if d.toInt <= 100 => d.toInt
+      case Some(d) => sendError(channel); return
+      case None => roll.dice
+    }
+    roll.face = Option(face) match {
+      case Some(f) if f.toInt <= 100 => f.toInt
+      case Some(f) => sendError(channel); return
+      case None => roll.face
+    }
 
     Option(num) match {
       case Some(n) if n.toInt <= 100 =>
@@ -102,6 +107,6 @@ class TrueRandBot extends PircBot {
 
   private def HaveRpResult(channel: String, sender: String): Unit = {
     this.sendMessage(channel, s"${Colors.BOLD}${Colors.DARK_GREEN}$sender" +
-                              s"${Colors.BLUE}今天的人品是${Colors.RED}${mst.nextInt(100) % 100 + 1}")
+      s"${Colors.BLUE}今天的人品是${Colors.RED}${mst.nextInt(100) % 100 + 1}")
   }
 }
