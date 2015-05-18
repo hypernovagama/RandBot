@@ -18,8 +18,10 @@ object TrueRandBotMain {
     // Connect to the IRC server.
     bot.connect("irc.ourirc.com", 6668)
 
+    // Identify the bot
+    bot.identify("!@#$TRUErandBOT%^&*")
+
     // Join the #pircbot channel.
-    
     bot.joinChannel("#truerandbot")
   }
 }

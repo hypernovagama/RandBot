@@ -2,11 +2,15 @@ package io.inflationaaron.truerandbot
 import org.jibble.pircbot._
 import org.apache.commons.math3.random._
 
+import scala.collection.immutable.TreeMap
+
 class TrueRandBot extends PircBot {
   this.setName("TrueRandBot")
   this.setLogin("TrueRandBot")
+  this.setVersion("TrueRandBot V0.1 @ BNDS")
 
   val mst = new MersenneTwister()
+  var timetree = new TreeMap[Long, String]();
 
   override def onMessage(channel: String,
                          sender: String,
@@ -30,6 +34,10 @@ class TrueRandBot extends PircBot {
                         sourceLogin: String,
                         sourceHostname: String,
                         channel: String): Unit = {
+    val elementstodrop = timetree.dropWhile(System.currentTimeMillis() - _._1 < 10*60*1000)
+    elementstodrop.foreach { e => this.partChannel(e._2, "Time Out") }
+    this.timetree --= elementstodrop.keySet
+    this.timetree += new Tuple2(System.currentTimeMillis(), channel)
     this.joinChannel(channel)
     this.sendMessage(channel, s"${Colors.BOLD}${Colors.RED}${targetNick}被${sourceNick}从异界召唤而来！")
   }
@@ -54,7 +62,7 @@ class TrueRandBot extends PircBot {
   }
 
   private def sendError(channel: String): Unit = {
-    this.sendMessage(channel, "/me 表示需要你提供一个更强的服务器才能完成你的任务！")
+    this.sendAction(channel, s"表示需要你提供一个${Colors.BOLD}更强的${Colors.NORMAL}服务器才能完成你的任务！")
   }
 
   private def HaveRollResult(num: String,
@@ -71,10 +79,10 @@ class TrueRandBot extends PircBot {
     val roll = new Roll(1, 20, bonusSum, mst)
 
     roll.dice = Option(dice) match { case Some(d) if d.toInt <= 100 => d.toInt
-                                     case Some(d) => sendError(channel) return
+                                     case Some(d) => sendError(channel);return
                                      case None => roll.dice }
     roll.face = Option(face) match { case Some(f) if f.toInt <= 100 => f.toInt
-                                     case Some(f) => sendError(channel) return
+                                     case Some(f) => sendError(channel);return
                                      case None => roll.face }
 
     Option(num) match {
