@@ -2,7 +2,7 @@ package io.inflationaaron.truerandbot
 import org.jibble.pircbot._
 import org.apache.commons.math3.random._
 
-import scala.collection.immutable.TreeMap
+import scala.collection.mutable
 
 class TrueRandBot extends PircBot {
   this.setName("TrueRandBot")
@@ -10,14 +10,15 @@ class TrueRandBot extends PircBot {
   this.setVersion("TrueRandBot V0.1 @ BNDS")
 
   val mst = new MersenneTwister()
-  var timetree = new TreeMap[Long, String]();
+  var TimeTree = new mutable.HashMap[String, Long]()
 
   override def onMessage(channel: String,
                          sender: String,
                          login: String,
                          hostname: String,
                          message: String): Unit = {
-    val RollExpression = """^.r (?:([1-9]+\d*)#)?([1-9]\d*)?d([1-9]\d*)?((?:\+[1-9]\d*)*) ?([\p{P}\w\u2E80-\u9FFF]*)""".r
+    val RollExpression = ("""^.r (?:([1-9]+\d*)#)?([1-9]\d*)?d([1-9]\d*)?((?:\+[1-9]\d*)*) """ +
+                          """?([\p{P}\w\u2E80-\u9FFF]*)""").r
     val LuckExpression = """^.rp""".r
 
     log(message)
@@ -34,10 +35,11 @@ class TrueRandBot extends PircBot {
                         sourceLogin: String,
                         sourceHostname: String,
                         channel: String): Unit = {
-    val elementstodrop = timetree.dropWhile(System.currentTimeMillis() - _._1 < 10*60*1000)
-    elementstodrop.foreach { e => this.partChannel(e._2, "Time Out") }
-    this.timetree --= elementstodrop.keySet
-    this.timetree += new Tuple2(System.currentTimeMillis(), channel)
+    val ElementsToDrop = TimeTree.dropWhile(System.currentTimeMillis() - _._2 < 10*60*1000)
+    ElementsToDrop.foreach { e => this.partChannel(e._1, "Timed Out") }
+    this.TimeTree --= ElementsToDrop.keySet
+    this.TimeTree += new Tuple2(channel, System.currentTimeMillis())
+
     this.joinChannel(channel)
     this.sendMessage(channel, s"${Colors.BOLD}${Colors.RED}${targetNick}被${sourceNick}从异界召唤而来！")
   }
