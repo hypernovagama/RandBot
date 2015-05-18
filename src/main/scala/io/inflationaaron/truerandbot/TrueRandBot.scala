@@ -2,18 +2,23 @@ package io.inflationaaron.truerandbot
 import org.jibble.pircbot._
 import org.apache.commons.math3.random._
 
+import scala.collection.mutable
+
 class TrueRandBot extends PircBot {
   this.setName("TrueRandBot")
   this.setLogin("TrueRandBot")
+  this.setVersion("TrueRandBot V0.1 @ BNDS")
 
   val mst = new MersenneTwister()
+  var TimeTree = new mutable.HashMap[String, Long]()
 
   override def onMessage(channel: String,
                          sender: String,
                          login: String,
                          hostname: String,
                          message: String): Unit = {
-    val RollExpression = """^.r (?:([1-9]+\d*)#)?([1-9]\d*)?d([1-9]\d*)?((?:\+[1-9]\d*)*) ?([\p{P}\w\u2E80-\u9FFF]*)""".r
+    val RollExpression = ("""^.r (?:([1-9]+\d*)#)?([1-9]\d*)?d([1-9]\d*)?((?:\+[1-9]\d*)*) """ +
+                          """?([\p{P}\w\u2E80-\u9FFF]*)""").r
     val LuckExpression = """^.rp""".r
 
     log(message)
@@ -30,6 +35,11 @@ class TrueRandBot extends PircBot {
                         sourceLogin: String,
                         sourceHostname: String,
                         channel: String): Unit = {
+    val ElementsToDrop = TimeTree.dropWhile(System.currentTimeMillis() - _._2 < 10*60*1000)
+    ElementsToDrop.foreach { e => this.partChannel(e._1, "Timed Out") }
+    this.TimeTree --= ElementsToDrop.keySet
+    this.TimeTree += new Tuple2(channel, System.currentTimeMillis())
+
     this.joinChannel(channel)
     this.sendMessage(channel, s"${Colors.BOLD}${Colors.RED}${targetNick}被${sourceNick}从异界召唤而来！")
   }
@@ -53,6 +63,10 @@ class TrueRandBot extends PircBot {
     s1.toString()
   }
 
+  private def sendError(channel: String): Unit = {
+    this.sendAction(channel, s"表示需要你提供一个${Colors.BOLD}更强的${Colors.NORMAL}服务器才能完成你的任务！")
+  }
+
   private def HaveRollResult(num: String,
                         dice: String,
                         face: String,
@@ -66,17 +80,22 @@ class TrueRandBot extends PircBot {
 
     val roll = new Roll(1, 20, bonusSum, mst)
 
-    roll.dice = Option(dice) match { case Some(d) => d.toInt; case None => roll.dice }
-    roll.face = Option(face) match { case Some(f) => f.toInt; case None => roll.face }
+    roll.dice = Option(dice) match { case Some(d) if d.toInt <= 100 => d.toInt
+                                     case Some(d) => sendError(channel);return
+                                     case None => roll.dice }
+    roll.face = Option(face) match { case Some(f) if f.toInt <= 100 => f.toInt
+                                     case Some(f) => sendError(channel);return
+                                     case None => roll.face }
 
     Option(num) match {
-      case Some(n) if n.isInstanceOf[String] =>
+      case Some(n) if n.toInt <= 100 =>
         val result = new Array[Array[Int]](n.toInt)
         for (i <- 0 until n.toInt) {
           result(i) = roll.doRoll()
         }
 
         this.sendMessage(channel, makeMultiString(sender, desc, result))
+      case Some(n) => sendError(channel)
       case _ => this.sendMessage(channel, makeString(sender, desc, roll.doRoll()))
     }
   }
