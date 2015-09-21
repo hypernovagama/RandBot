@@ -2,7 +2,7 @@ name := """RandBot"""
 
 version := "0.0.1"
 
-scalaVersion := "2.11.5"
+scalaVersion := "2.11.7"
 
 libraryDependencies ++= Seq(
   "org.apache.commons" % "commons-math3" % "3.5",
