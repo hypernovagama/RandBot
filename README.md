@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/hypernovagama/RandBot.svg?branch=master)](https://travis-ci.org/hypernovagama/RandBot)
 # RandBot
 Just another dice rolling bot based on Pircbot.
 
@@ -6,6 +7,14 @@ Based on the balanced algorithm of Mersenne Twister, this bot is supposed to be 
 
 ## Interesting tricks
 I add some interesting texts and reactions to its action list, so have a try.
+
+## Using
+```
+git clone https://github.com/hypernovagama/RandBot.git
+cd RandBot
+sbt run
+```
+I only test with 2.10 and 2.11 version of Scala and 2.9 is not supported.
 
 ## License
 The MIT License (MIT)
