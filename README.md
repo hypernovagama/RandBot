@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/hypernovagama/RandBot.svg?branch=master)](https://travis-ci.org/hypernovagama/RandBot)
+[![Build Status](https://travis-ci.org/inflation/RandBot.svg?branch=master)](https://travis-ci.org/inflation/RandBot)
 # RandBot
 Just another dice rolling bot based on Pircbot.
 
