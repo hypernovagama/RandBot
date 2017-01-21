@@ -10,16 +10,16 @@ I add some interesting texts and reactions to its action list, so have a try.
 
 ## Using
 ```
-git clone https://github.com/hypernovagama/RandBot.git
+git clone https://github.com/inflation/RandBot.git
 cd RandBot
 sbt run
 ```
-I only test with 2.10 and 2.11 version of Scala and 2.9 is not supported.
+Tested with 2.10, 2.11 and 2.12.
 
 ## License
 The MIT License (MIT)
 
-Copyright (c) 2015 Aaron Hu
+Copyright (c) 2017 Aaron Hu
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

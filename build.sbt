@@ -2,10 +2,10 @@ name := """RandBot"""
 
 version := "0.0.1"
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.12.1"
 
 libraryDependencies ++= Seq(
-  "org.apache.commons" % "commons-math3" % "3.5",
+  "org.apache.commons" % "commons-math3" % "3.6.1",
   "pircbot" % "pircbot" % "1.5.0",
-  "org.scalatest" %% "scalatest" % "2.2.4" % "test"
+  "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 )
