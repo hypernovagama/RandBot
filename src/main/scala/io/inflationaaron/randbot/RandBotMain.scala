@@ -1,7 +1,5 @@
 package io.inflationaaron.randbot
 
-import org.jibble.pircbot._
-
 object RandBotMain {
   def main(args: Array[String]) {
     // Now start our bot up.
@@ -17,7 +15,7 @@ object RandBotMain {
     bot.setEncoding("UTF-8")
 
     // Connect to the IRC server.
-    bot.connect("irc.ourirc.com", 6668)
+    bot.connect("irc3.ourirc.com", 6668)
 
     // Identify the bot
     bot.identify("!@#$TRUErandBOT%^&*")
