@@ -1,4 +1,4 @@
-package io.inflationaaron.randbot
+package moe.infl.randbot
 
 object RandBotMain {
   def main(args: Array[String]) {

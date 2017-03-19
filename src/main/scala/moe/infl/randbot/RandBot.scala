@@ -1,4 +1,4 @@
-package io.inflationaaron.randbot
+package moe.infl.randbot
 
 import org.jibble.pircbot._
 import org.apache.commons.math3.random._

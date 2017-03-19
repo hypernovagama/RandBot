@@ -1,5 +1,5 @@
+import moe.infl.randbot.Roll
 import org.scalatest._
-import io.inflationaaron.randbot.Roll
 import org.apache.commons.math3.random._
 
 class RollSpec extends FlatSpec with Matchers {
