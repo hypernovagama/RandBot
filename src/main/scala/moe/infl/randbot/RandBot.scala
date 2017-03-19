@@ -8,7 +8,7 @@ import scala.collection.mutable
 class RandBot extends PircBot {
   this.setName("RandBot")
   this.setLogin("RandBot")
-  this.setVersion("RandBot V0.2 @ BNDS")
+  this.setVersion("RandBot V0.2")
 
   val mst = new MersenneTwister()
   var TimeTree = new mutable.HashMap[String, Long]()
